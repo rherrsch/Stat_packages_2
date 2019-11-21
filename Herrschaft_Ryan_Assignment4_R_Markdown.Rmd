@@ -1,0 +1,167 @@
+---
+title: "Herrschaft_Ryan_Assignment4_R_Markdown"
+output: html_notebook
+---
+Ryan Herrschaft, 11/21/19
+This is the R-script for assignment 4
+ 
+First I start out with some code to set up the document.
+```{r}
+#Clean out environment
+rm(list = ls())
+
+
+#Session info
+date()
+sessionInfo()
+
+#install needed packages
+#install.packages("dslabs")
+#install.packages ("tidyverse")
+#install.packages("Hmisc")
+library(Hmisc)
+library (dslabs)
+library (tidyverse)
+
+bednet <- read_csv("C:/Users/rherrsch/Downloads/ghana_bednet.csv")
+bednet
+```
+Questions 1 & 2: There are eight variables and 26,342 observations
+```{r}
+describe(bednet)
+#Questions 1 & 2: There are eight variables and 26,342 observations
+
+summary(bednet)
+```
+
+
+3.)What proportion of the children represented in the dataset are male?
+
+```{r}
+#Note, 0 is male, 1 is female
+#Need to clean sex variable
+
+bednet$sex[bednet$sex=="F"] <- 1
+
+bednet$sex[bednet$sex=="."] <- NA
+
+describe(bednet$sex)
+```
+13305/26,341 or 55.05% of children are male.
+
+
+
+
+4.) What is the total number of years of follow-up experienced by female children in intervention areas?
+```{r}
+
+
+#Note that the variable "bednet" says if the child was in an intervention area. 0=control, 1=intervention
+#Also note that for sex variable 1=female
+#and, follyr is the continuous follow-up variable
+
+female_only <- filter(bednet, sex == 1, bednet == 1)
+describe (female_only$follyr)
+
+#There was a missing value that had to be accounted for.
+
+sum(female_only$follyr, na.rm = TRUE)
+
+
+```
+The total number of years is 8395.184
+
+5.)What is the proportion of all children in cluster 52 who died during followup?
+```{r}
+# Note that outcome is the variable that tells you if a child died 0=no, 1=yes
+
+cluster_52_only <- filter(bednet, cluster == "52")
+describe (cluster_52_only$outcome)
+
+```
+9 out of the 370 children died. This is 2.43% of children in cluster 52.
+
+
+6.) What is the mean and standard deviation of the subjects age?
+```{r}
+mean(bednet$agemn)
+sd(bednet$agemn)
+```
+
+The mean age is 25.29. The standard deviation of age is 18.025.
+
+
+7.  Calculate the mortality rate (number or deaths per person year of follow up) in the control arm and, separately, in the intervention arm.
+```{r}
+#bednet is control/intervention varaible. 0 means control, 1 means intervention
+
+control_only <- filter(bednet, bednet ==0)
+intervention_only <- filter(bednet, bednet==1)
+
+
+#mortality rate per person per year can be calculated by (number of deaths) over follyr(person years number of followup)
+#because deaths are coded as 1, we can count deaths by taking the sum of the outcome variable
+
+sum_deaths_control <-sum(control_only$outcome)
+sum_deaths_control
+#there were 461 deaths in the control group.
+
+#from here, we find the number of deaths in the control sample. We take this number and divide it by the sum of follyr.
+
+sum_follow_year_control <- sum(control_only$follyr, na.rm = TRUE)
+sum_follow_year_control
+
+#Finally, we take the number of deaths and divide by sum of follyr
+mort_rate_control <-(sum_deaths_control)/(sum_follow_year_control)
+mort_rate_control
+#The mortality person rate per person per year for the control group is .02795
+
+
+#We now repeat these steps but for the intervention group.
+sum_deaths_intervention <-sum(intervention_only$outcome)
+sum_deaths_intervention
+#there were 396 deaths in the intervention group.
+
+#from here, we find the number of deaths in the intervention sample. We take this number and divide it by the sum of follyr.
+sum_follow_year_intervention <- sum(intervention_only$follyr, na.rm = TRUE)
+sum_follow_year_intervention
+#Finally, we take the number of deaths and divide by sum of follyr
+mort_rate_intervention <-(sum_deaths_intervention)/(sum_follow_year_intervention)
+mort_rate_intervention
+
+# The morality rate per person per year for the intervention group is  0.02351
+
+```
+The mortality person rate per person per year for the control group is .02795
+
+The morality rate per person per year for the intervention group is  0.02351
+
+
+8. Make a bar chart showing the proportion of participants who died in each cluster.
+```{r}
+#I had trouble using the "group by" command to generate these results. Instead, I used aggregate
+
+mean_death_by_cluster <- aggregate(bednet$outcome, by=list(bednet$cluster), FUN=mean) %>% rename(cluster_group = Group.1) %>% rename(Prop_death = x)
+
+mean_death_by_cluster
+
+barplot1<-ggplot(data= mean_death_by_cluster, aes(x= cluster_group, y= Prop_death)) + geom_bar(stat="identity") +ggtitle("Proportion of participants who died in each cluster") +labs(y= "Proportion of Deaths", x="Cluster Number") 
+barplot1
+```
+
+9.  Use the glm() function from base R's stats package, and the formula 'out- come  ~ bednet'with the family argument specified as 'binomial(link = "logit")' to fit a logistic regression. Print the summary of this regression in your document.
+```{r}
+model <- glm(outcome ~ bednet, data=bednet, binomial(link= "logit"))
+summary (model) 
+print(model)
+```
+
+10. Was being in an intervention cluster (i.e. having bednets) associated with lower or higher
+probability of a child dying during the course of the trial?
+What was the coefficient (or odds ratio (specify which)) and p-value for this conclusion.
+
+```{r}
+exp(coef(model))
+```
+The odds ratio is 0.836 (p<.05), meaning that those with bednets had a decreased chance of having a child die during the course of the trial.
+
