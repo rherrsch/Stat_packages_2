@@ -41,6 +41,8 @@ summary(bednet)
 #Note, 0 is male, 1 is female
 #Need to clean sex variable
 
+#your output reported the correct percent (50.5), however you incorrectly reported below 55.05%
+
 bednet$sex[bednet$sex=="F"] <- 1
 
 bednet$sex[bednet$sex=="."] <- NA
@@ -48,7 +50,6 @@ bednet$sex[bednet$sex=="."] <- NA
 describe(bednet$sex)
 ```
 13305/26,341 or 55.05% of children are male.
-
 
 
 
@@ -147,6 +148,8 @@ mean_death_by_cluster
 
 barplot1<-ggplot(data= mean_death_by_cluster, aes(x= cluster_group, y= Prop_death)) + geom_bar(stat="identity") +ggtitle("Proportion of participants who died in each cluster") +labs(y= "Proportion of Deaths", x="Cluster Number") 
 barplot1
+#close to perfect, I would add a layer (two different colors) that distinguished between clusters who received bednets and those who didn't
+
 ```
 
 9.  Use the glm() function from base R's stats package, and the formula 'out- come  ~ bednet'with the family argument specified as 'binomial(link = "logit")' to fit a logistic regression. Print the summary of this regression in your document.
@@ -165,3 +168,4 @@ exp(coef(model))
 ```
 The odds ratio is 0.836 (p<.05), meaning that those with bednets had a decreased chance of having a child die during the course of the trial.
 
+#Good preamble and well written script. Good approach with preparing data before analysis; for question 7 your intermediate steps were nice, I would suggest using piping operators to reduce the amount of intermediate steps but this is a good start to get on your way there!
