@@ -14,14 +14,11 @@ rm(list = ls())
 date()
 sessionInfo()
 
-#install.packages ("tidyverse")
-#install.packages ("Hmisc")
-#install.packages ("dplyr")
-#install.packages("stringr")
 library (tidyverse)
 library (Hmisc)
 library (dplyr)
 library(stringr)
+#just include library commands of the packages you installed, not ned to have the install.packages line
 
 Nola_Crime <- read_csv("/Users/ryanherrschaft/Downloads/nola_crime_2018.csv")
 ```
@@ -70,7 +67,7 @@ The French Quarter and Little Woods have the largest number of unique crime repo
 ```{r}
 #This is the same variable item variable as above, I am adding in population and then creating the rate
 
-Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop, na_rm=FALSE)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000))
+Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop, na_rm=FALSE)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop)))
   
 head(Crime_Rate_by_district)
 ```
@@ -80,7 +77,7 @@ head(Crime_Rate_by_district)
 #I am just using the same code as last time, but I am going to arrange by population.
 #Since the distrcits are grouped by nieghborhood, the mean population is just the population by neighborhood. I  could of had the population appear wihtout taking the mean, but I had some trouble doing this. Considering the mean of population is the same as the population, this should be the same table.
 
-Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000)) %>% arrange(desc(pop))
+Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop))) %>% arrange(desc(pop))
   
 head(Crime_Rate_by_district)
 ```
@@ -91,7 +88,7 @@ The largest neighborhood by population is Little Woods, with a population of 44,
 ```{r}
 #This is the same code as before, only I am arranging by the Rate of Crime in ascending order.
 
-Q_8_Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000)) %>% arrange(Rate_of_Crime_per_1000)
+Q_8_Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop))) %>% arrange(Rate_of_Crime_per_1000)
   
 head(Q_8_Crime_Rate_by_district)
 ```
@@ -101,7 +98,7 @@ Lakewood has the lowest rate of crime. There were 10 incidents of crime and the 
 ```{r}
 #The rate of crime in Lakewood was .7148474
 
-Q_9_Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000)) %>% mutate(Rate_Ratio_Lakewood = ((Rate_of_Crime_per_1000/.7148474)))
+Q_9_Crime_Rate_by_district <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop))) %>% mutate(Rate_Ratio_Lakewood = ((Rate_of_Crime_per_1000/.7148474)))
                            
 head(Q_9_Crime_Rate_by_district)                                                              
 ```
@@ -111,7 +108,7 @@ head(Q_9_Crime_Rate_by_district)
 ```{r}
 #First I am going to find out the rate of aggravateed crimes for all districts. I am going to arrange them in decreasing order of rate of crime. 
 
-Aggravated_crime <- Nola_Crime %>% filter(grepl('AGGRAVATED', Signal_Description)) %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000)) %>% arrange(desc(Rate_of_Crime_per_1000))
+Aggravated_crime <- Nola_Crime %>% filter(grepl('AGGRAVATED', Signal_Description)) %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop))) %>% arrange(desc(Rate_of_Crime_per_1000))
 
 head(Aggravated_crime)
 #With this, I see that the French Quarter has the highest crime rate, .98866333. I then take this value as the denominator for the variable Rate_Ratio_FQ
@@ -120,7 +117,7 @@ head(Aggravated_crime)
 
 #The below statement gives me the table I want. 
 
-Q_10_Rate_Aggravated_crime <- Nola_Crime %>% filter(grepl('AGGRAVATED', Signal_Description)) %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000)) %>% mutate(Rate_Ratio_FQ = ((Rate_of_Crime_per_1000/.98866333)))
+Q_10_Rate_Aggravated_crime <- Nola_Crime %>% filter(grepl('AGGRAVATED', Signal_Description)) %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop))) %>% mutate(Rate_Ratio_FQ = ((Rate_of_Crime_per_1000/.98866333)))
 
 head(Q_10_Rate_Aggravated_crime)
 ```
@@ -136,14 +133,15 @@ head(Reports)
 Charges <- Nola_Crime %>% group_by(Charge_Code) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE))  %>% arrange(desc(item_numbers))
 
 head(Charges)
+#Charge_Description was the appropriate variable to use here, instead of Charge_code
 
   #I see that the Charge_Code 14 67 is the most commonly filed code.
 ```
 
 12.)Calculate the rate of domestic disturbance (again based on “signal descrip- tion”) by neighborhood and show this as a table in your report.
 ```{r}
-dom_disturb <- Nola_Crime %>%  filter(str_detect(Signal_Description,"DOMESTIC")) %>% filter(str_detect(Signal_Description, "DISTURBANCE")) %>% group_by(GNOCDC_LAB) %>% summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000))
-
+dom_disturb <- Nola_Crime %>%  filter(str_detect(Signal_Description,"DOMESTIC")) %>% filter(str_detect(Signal_Description, "DISTURBANCE")) %>% group_by(GNOCDC_LAB) %>% summarise (item_numbers = n_distinct(Item_Number, na_rm= FALSE), pop=mean(pop)) %>% mutate(Rate_of_Crime_per_1000=((item_numbers/pop)))
+#question only asks for rate (including person time is not necessary)
 head(dom_disturb)
 ```
 
@@ -151,7 +149,7 @@ head(dom_disturb)
 ```{r}
 #I had trouble creating a code that would have all of the infomraiton I need appear in one table. So, I just created two different tables and then merged them.
 
-Crime_Rate_13 <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= TRUE), pop=mean(pop)) %>%  mutate(Rate_of_Crime_per_1000=((item_numbers/pop)*1000))
+Crime_Rate_13 <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= TRUE), pop=mean(pop)) %>%  mutate(Rate_of_Crime_per_1000=((item_numbers*1000/pop)))
 
 Mean_age_avg<- aggregate(Victim_Age ~ GNOCDC_LAB, Nola_Crime, mean)
 
@@ -159,7 +157,9 @@ data_for_lm<-merge(Crime_Rate_13, Mean_age_avg)
 head(data_for_lm)
  
 lm_item_age<-glm(item_numbers~Victim_Age, data=data_for_lm)
+#instead of item_numbers as your outcome, it is crime rate
 summary(lm_item_age)
+
 ```
 
 14.) Assume that high numbers of police reports happen in places with adequate police responsiveness but that true rates of criminal acts are similar everywhere. If this is true than the absolute numbers of crimes depend only on population size but the number of reports depends on both population size and crime rates. If these hypothesis are true, which neighborhood might have the worst police responsiveness (i.e. Low rates of crime reporting - i.e. low numbers of signals/reports and high population)?
@@ -170,7 +170,7 @@ summary(lm_item_age)
 
 #By arranging the values in ascending order of Crime/Population, we can see where we have cases of population increasing without proportional increases in crime. Thus, the values at the top of our table may be those neighborhoods in which there is low police responsiveness.
 
-Crime_14 <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= TRUE), pop=mean(pop)) %>% mutate(Police_Response=((item_numbers/pop)*1000)) %>% arrange(Police_Response)
+Crime_14 <- Nola_Crime %>% group_by(GNOCDC_LAB) %>%  summarise (item_numbers = n_distinct(Item_Number, na_rm= TRUE), pop=mean(pop)) %>% mutate(Police_Response=((item_numbers*1000/pop))) %>% arrange(Police_Response)
 
 head(Crime_14)
 ```
@@ -195,7 +195,8 @@ for (Species in c("setos", "versicolor", "virginica"))
 {
 summarised_iris <-iris %>% summarise(mean=mean(Sepal.Length))
   }
-
+#this just summarizes the mean sepal length but the question wants the length for each of the three species of irises
+#length for each of the species of iris and prints the results. 
 print(summarised_iris)
 
 detach(iris)
